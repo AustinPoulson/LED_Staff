@@ -1,14 +1,9 @@
-
 #include <FastLED.h>
-
-
 
 #define LED_PIN0    0
 #define LED_PIN1    1
 #define LED_COUNT 158
-bool isClicked = isClicked;
-bool button = button;
-bool demoMode = demoMode;
+int isClicked = isClicked;
 bool initMode = initMode;
 int mode = mode;
 int MODECOUNT = 7;
@@ -21,52 +16,41 @@ CRGB leds0[LED_COUNT];
 CRGB leds1[LED_COUNT];
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
   FastLED.addLeds<WS2812B, LED_PIN0, GRB>(leds0, LED_COUNT); //button 3
   FastLED.addLeds<WS2812B, LED_PIN1, GRB>(leds1, LED_COUNT); //button 4
-  pinMode(3,INPUT_PULLUP); //led 0 button
-  pinMode(4,INPUT_PULLUP); //led 1 button
+  pinMode(3, INPUT_PULLUP); //led 0 button
+  pinMode(4, INPUT_PULLUP); //led 1 button
 }
 
-void loop() {
+void checkButtons() {
   int buttonVal0 = digitalRead(3);
   int buttonVal1 = digitalRead(4);
 
-  //Button logic
-  if (buttonVal0 == HIGH && buttonVal1 == HIGH && isClicked == 1){
+  //This is the reset function. If no buttons are pressed, set isClicked to 0.
+  if (buttonVal0 == HIGH && buttonVal1 == HIGH && isClicked >= 1){
     isClicked = 0;
   }
 
-  //Problem: This button only activates modes 1-3. 
   if (buttonVal0 == LOW && isClicked == 0){
-    button = 0;
     isClicked = 1;
     initMode = 1;
     if (mode < MODECOUNT){
       mode++;
-    }else mode = 0;
+    } else mode = 0;
   }
   
   if (buttonVal1 == LOW && isClicked == 0){
-    button = 1;
-    isClicked = 1;
+    isClicked = 2;
     initMode = 1;
     if (mode > 0){
       mode--;
-    }else mode = MODECOUNT;
+    } else mode = MODECOUNT;
   }
+}
 
-  //Mode logic
-  if (mode == 0){
-    demoMode = 1;
-    delay(1);
-  }else{
-    demoMode = 0;
-  }
-
-  if (mode == 1){ //Dops RGB (Flash 3)
-    if (initMode == 1){
+void dopsRGB() { //Dops RGB (Flash 3)
+  if (initMode == 1){
       r = 255;
       cycle = 0;
       initMode = 0;
@@ -103,10 +87,10 @@ void loop() {
     }
     FastLED.show();
     delay(100);
-  }
+}
 
-  if (mode == 2){ //Rainbow fade (fade 7)
-    if (initMode == 1){
+void rainbowFade() { //Rainbow fade (fade 7)
+  if (initMode == 1){
       r = 255;
       initMode = 0;
     }
@@ -134,14 +118,10 @@ void loop() {
     }
     FastLED.show();
     delay(1);
-  }
+}
 
-
-
-
-
-  if (mode == 3){//twinkle random
-    if (initMode == 1){
+void twinklePastel() { //twinkle including pastel colors and whites. (fully random colors)
+  if (initMode == 1){
       initMode = 0;
       for(int i = 0; i < LED_COUNT; i++){
         leds0[i] = CRGB(0, 0, 0);
@@ -156,10 +136,10 @@ void loop() {
     leds1[random(LED_COUNT)] = CRGB(0, 0, 0);
     FastLED.show();
     delay(1);
-  }
+}
 
-  if (mode == 4){//twinkle random, color quanitized
-    if (initMode == 1){
+void twinkleRectified() { //twinkle random colors, colors adjusted to avoid pastels and whites
+  if (initMode == 1){
       initMode = 0;
       for(int i = 0; i < LED_COUNT; i++){
         leds0[i] = CRGB(0, 0, 0);
@@ -187,10 +167,10 @@ void loop() {
     leds1[random(LED_COUNT)] = CRGB(0, 0, 0);
     FastLED.show();
     delay(1);
-  }
+}
 
-  if (mode == 5){ //Dops Random
-    if (initMode == 1){
+void dopsRandom() { //dops random, including pastels and whites.
+  if (initMode == 1){
       initMode = 0;
     }
     switch(cycle){
@@ -218,10 +198,10 @@ void loop() {
     }
     FastLED.show();
     delay(50);
-  }
+}
 
-  if (mode == 6){ //Dops Random, color quanitzed
-    if (initMode == 1){
+void dopsRandomRectified() { //dops random, adjusted colors to avoid pastels and whites
+  if (initMode == 1){
       initMode = 0;
     }
     switch(cycle){
@@ -268,10 +248,10 @@ void loop() {
     }
     FastLED.show();
     delay(50);
-  }
+}
 
-  if (mode == 7){
-    if (initMode == 1){
+void sinWave() {
+  if (initMode == 1){
       initMode = 0;
       cycle = 0;
     }
@@ -282,8 +262,32 @@ void loop() {
     }
     FastLED.show();
     delay(50);
+}
+
+void loop() {
+  checkButtons();
+
+  switch(mode) {
+    case 0:
+      dopsRGB();
+      break;
+    case 1:
+      rainbowFade();
+      break;
+    case 2:
+      twinklePastel();
+      break;
+    case 3:
+      twinkleRectified();
+      break;
+    case 4:
+      dopsRandom(); //currently broken
+      break;
+    case 5:
+      dopsRandomRectified();
+      break;
+    case 6:
+      sinWave(); //currently broken
+      break;
   }
-  
-  //FastLED.show();
-  //delay(10);
 }
