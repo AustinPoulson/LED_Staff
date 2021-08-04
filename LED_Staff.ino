@@ -51,91 +51,91 @@ void checkButtons() {
 
 void dopsRGB() { //Dops RGB (Flash 3)
   if (initMode == 1){
+    r = 255;
+    cycle = 0;
+    initMode = 0;
+  }
+  switch(cycle){
+    case 0:
       r = 255;
+      cycle = 1;
+      break;
+    case 1:
+      r = 0;
+      cycle = 2;
+      break;
+    case 2:
+      g = 255;
+      cycle = 3;
+      break;
+    case 3:
+      g = 0;
+      cycle = 4;
+      break;
+    case 4:
+      b = 255;
+      cycle = 5;
+      break;
+    case 5:
+      b = 0;
       cycle = 0;
-      initMode = 0;
-    }
-    switch(cycle){
-      case 0:
-        r = 255;
-        cycle = 1;
-        break;
-      case 1:
-        r = 0;
-        cycle = 2;
-        break;
-      case 2:
-        g = 255;
-        cycle = 3;
-        break;
-      case 3:
-        g = 0;
-        cycle = 4;
-        break;
-      case 4:
-        b = 255;
-        cycle = 5;
-        break;
-      case 5:
-        b = 0;
-        cycle = 0;
-        break;
-    }
-    for(int i = 0; i < LED_COUNT; i++){
-      leds0[i] = CRGB(r, g, b);
-      leds1[i] = CRGB(r, g, b);
-    }
-    FastLED.show();
-    delay(100);
+      break;
+  }
+  for(int i = 0; i < LED_COUNT; i++){
+    leds0[i] = CRGB(r, g, b);
+    leds1[i] = CRGB(r, g, b);
+  }
+  FastLED.show();
+  delay(100);
 }
 
 void rainbowFade() { //Rainbow fade (fade 7)
   if (initMode == 1){
       r = 255;
       initMode = 0;
-    }
-    if (r == 255 && g < 255 && b == 0){
-      g++;
-    }
-    if (r <= 255 && g == 255 && b == 0){
-      r--;
-    }
-    if (r == 0 && g == 255 && b < 255){
-      b++;
-    }
-    if (r == 0 && g <= 255 && b == 255){
-      g--;
-    }
-    if (r < 255 && g == 0 && b == 255){
-      r++;
-    }
-    if (r == 255 && g == 0 && b <= 255){
-      b--;
-    }
-    for(int i = 0; i < LED_COUNT; i++){
-      leds0[i] = CRGB(r, g, b);
-      leds1[i] = CRGB(r, g, b);
-    }
-    FastLED.show();
-    delay(1);
+  }
+  if (r == 255 && g < 255 && b == 0){
+    g++;
+  }
+  if (r <= 255 && g == 255 && b == 0){
+    r--;
+  }
+  if (r == 0 && g == 255 && b < 255){
+    b++;
+  }
+  if (r == 0 && g <= 255 && b == 255){
+    g--;
+  }
+  if (r < 255 && g == 0 && b == 255){
+    r++;
+  }
+  if (r == 255 && g == 0 && b <= 255){
+    b--;
+  }
+  for(int i = 0; i < LED_COUNT; i++){
+    leds0[i] = CRGB(r, g, b);
+    leds1[i] = CRGB(r, g, b);
+  }
+  FastLED.show();
+  delay(1);
 }
 
 void twinklePastel() { //twinkle including pastel colors and whites. (fully random colors)
   if (initMode == 1){
-      initMode = 0;
-      for(int i = 0; i < LED_COUNT; i++){
-        leds0[i] = CRGB(0, 0, 0);
-        leds1[i] = CRGB(0, 0, 0);
-      }
+    initMode = 0;
+    for(int i = 0; i < LED_COUNT; i++){
+      leds0[i] = CRGB(0, 0, 0);
+      leds1[i] = CRGB(0, 0, 0);
     }
-    leds0[random(LED_COUNT)] = CRGB(random(255), random(255), random(255));
-    leds1[random(LED_COUNT)] = CRGB(random(255), random(255), random(255));
-    leds0[random(LED_COUNT)] = CRGB(0, 0, 0);
-    leds1[random(LED_COUNT)] = CRGB(0, 0, 0);
-    leds0[random(LED_COUNT)] = CRGB(0, 0, 0);
-    leds1[random(LED_COUNT)] = CRGB(0, 0, 0);
-    FastLED.show();
-    delay(1);
+  }
+  leds0[random(LED_COUNT)] = CRGB(random(255), random(255), random(255));
+  leds1[random(LED_COUNT)] = CRGB(random(255), random(255), random(255));
+  leds0[random(LED_COUNT)] = CRGB(0, 0, 0);
+  leds1[random(LED_COUNT)] = CRGB(0, 0, 0);
+  leds0[random(LED_COUNT)] = CRGB(0, 0, 0);
+  leds1[random(LED_COUNT)] = CRGB(0, 0, 0);
+  FastLED.show();
+  delay(1);
 }
 
 void twinkleRectified() { //twinkle random colors, colors adjusted to avoid pastels and whites
@@ -146,108 +146,110 @@ void twinkleRectified() { //twinkle random colors, colors adjusted to avoid past
         leds1[i] = CRGB(0, 0, 0);
       }
     }
-    switch(random(2)){
-      case 0:
-        leds0[random(LED_COUNT)] = CRGB(random(255), random(255), 0);
-        leds1[random(LED_COUNT)] = CRGB(random(255), random(255), 0);
-        break;
-      case 1:
-        leds0[random(LED_COUNT)] = CRGB(random(255), 0, random(255));
-        leds1[random(LED_COUNT)] = CRGB(random(255), 0, random(255));
-        break;
-      case 2:
-        leds0[random(LED_COUNT)] = CRGB(0, random(255), random(255));
-        leds1[random(LED_COUNT)] = CRGB(0, random(255), random(255));
-        break;
-    }
-    
-    leds0[random(LED_COUNT)] = CRGB(0, 0, 0);
-    leds1[random(LED_COUNT)] = CRGB(0, 0, 0);
-    leds0[random(LED_COUNT)] = CRGB(0, 0, 0);
-    leds1[random(LED_COUNT)] = CRGB(0, 0, 0);
-    FastLED.show();
-    delay(1);
+  switch(random(2)){
+    case 0:
+      leds0[random(LED_COUNT)] = CRGB(random(255), random(255), 0);
+      leds1[random(LED_COUNT)] = CRGB(random(255), random(255), 0);
+      break;
+    case 1:
+      leds0[random(LED_COUNT)] = CRGB(random(255), 0, random(255));
+      leds1[random(LED_COUNT)] = CRGB(random(255), 0, random(255));
+      break;
+    case 2:
+      leds0[random(LED_COUNT)] = CRGB(0, random(255), random(255));
+      leds1[random(LED_COUNT)] = CRGB(0, random(255), random(255));
+      break;
+  }
+  
+  leds0[random(LED_COUNT)] = CRGB(0, 0, 0);
+  leds1[random(LED_COUNT)] = CRGB(0, 0, 0);
+  leds0[random(LED_COUNT)] = CRGB(0, 0, 0);
+  leds1[random(LED_COUNT)] = CRGB(0, 0, 0);
+  FastLED.show();
+  delay(1);
 }
 
 void dopsRandom() { //dops random, including pastels and whites.
   if (initMode == 1){
       initMode = 0;
+      cycle = 0;
     }
-    switch(cycle){
-      case 0:
-        r = random(200);
-        g = random(200);
-        b = random(200);
-        cycle = 1;
-        if(r+g+b>300){
-          r -= 100;
-          b -= 100;
-          g -= 100;
-        }
-        break;
-      case 1:
-        r = 0;
-        g = 0;
-        b = 0;
-        cycle = 0;
-        break;
+  switch(cycle){
+    case 0:
+      r = random(200);
+      g = random(200);
+      b = random(200);
+      cycle = 1;
+      if(r+g+b>300){
+        r -= 100;
+        b -= 100;
+        g -= 100;
+      }
+      break;
+    case 1:
+      r = 0;
+      g = 0;
+      b = 0;
+      cycle = 0;
+      break;
     }
-    for(int i = 0; i < LED_COUNT; i++){
-      leds0[i] = CRGB(r, g, b);
-      leds1[i] = CRGB(r, g, b);
-    }
-    FastLED.show();
-    delay(50);
+  for(int i = 0; i < LED_COUNT; i++){
+    leds0[i] = CRGB(r, g, b);
+    leds1[i] = CRGB(r, g, b);
+  }
+  FastLED.show();
+  delay(1);
 }
 
 void dopsRandomRectified() { //dops random, adjusted colors to avoid pastels and whites
   if (initMode == 1){
       initMode = 0;
+      cycle = 0;
     }
-    switch(cycle){
-      case 0:
-        r = random(200);
-        g = random(200);
-        b = 0;
-        cycle++;
-        break;
-      case 1:
-        r = 0;
-        g = 0;
-        b = 0;
-        cycle++;
-        break;
-      case 2:
-        r = random(200);
-        g = 0;
-        b = random(200);
-        cycle++;
-        break;
-      case 3:
-        r = 0;
-        g = 0;
-        b = 0;
-        cycle++;
-        break;
-      case 4:
-        r = 0;
-        g = random(200);
-        b = random(200);
-        cycle++;
-        break;
-      case 5:
-        r = 0;
-        g = 0;
-        b = 0;
-        cycle = 0;
-        break;
-    }
-    for(int i = 0; i < LED_COUNT; i++){
-      leds0[i] = CRGB(r, g, b);
-      leds1[i] = CRGB(r, g, b);
-    }
-    FastLED.show();
-    delay(50);
+  switch(cycle){
+    case 0:
+      r = random(200);
+      g = random(200);
+      b = 0;
+      cycle++;
+      break;
+    case 1:
+      r = 0;
+      g = 0;
+      b = 0;
+      cycle++;
+      break;
+    case 2:
+      r = random(200);
+      g = 0;
+      b = random(200);
+      cycle++;
+      break;
+    case 3:
+      r = 0;
+      g = 0;
+      b = 0;
+      cycle++;
+      break;
+    case 4:
+      r = 0;
+      g = random(200);
+      b = random(200);
+      cycle++;
+      break;
+    case 5:
+      r = 0;
+      g = 0;
+      b = 0;
+      cycle = 0;
+      break;
+  }
+  for(int i = 0; i < LED_COUNT; i++){
+    leds0[i] = CRGB(r, g, b);
+    leds1[i] = CRGB(r, g, b);
+  }
+  FastLED.show();
+  delay(1);
 }
 
 void sinWave() {
@@ -255,13 +257,20 @@ void sinWave() {
       initMode = 0;
       cycle = 0;
     }
-    cycle++;
-    for(int i = 0; i < LED_COUNT; i++){
-      leds0[i] = CRGB(sin(i+cycle)), (sin(i+cycle)), (sin(i+cycle));
-      leds1[i] = CRGB(sin(i+cycle)), (sin(i+cycle)), (sin(i+cycle));
-    }
-    FastLED.show();
-    delay(50);
+  cycle++;
+  for(int i = 0; i < LED_COUNT; i++){
+    leds0[i] = CRGB(sin(i+cycle)), (sin(i+cycle)), (sin(i+cycle));
+    leds1[i] = CRGB(sin(i+cycle)), (sin(i+cycle)), (sin(i+cycle));
+  }
+  FastLED.show();
+  delay(50);
+}
+
+void slip() {
+  if (initMode == 1){
+    initMode = 0;
+    cycle = 0;
+  }
 }
 
 void loop() {
@@ -281,7 +290,7 @@ void loop() {
       twinkleRectified();
       break;
     case 4:
-      dopsRandom(); //currently broken
+      dopsRandom();
       break;
     case 5:
       dopsRandomRectified();
