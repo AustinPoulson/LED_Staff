@@ -6,11 +6,13 @@
 int isClicked = isClicked;
 bool initMode = initMode;
 int mode = mode;
-int MODECOUNT = 8;
+int MODECOUNT = 15;
 int r = r;
 int g = g;
 int b = b;
 int cycle = cycle;
+int subCycle = subCycle;
+int dopsArr1[] = {150, 0, 0, 0, 0, 0, 0, 150, 0, 0, 0, 0, 0, 0, 150, 0, 0, 0};
 
 CRGB leds0[LED_COUNT];
 CRGB leds1[LED_COUNT];
@@ -99,17 +101,93 @@ void dopsRGB() { //Dops RGB (Flash 3)
   delay(100);
 }
 
-void dops(int red1, int green1, int blue1, int red2, int green2, int blue2, int red3, int green3, int blue3, int red4, int green4, int blue4, int red5, int green5, int blue5, int red6, int green6, int blue6, int red7, int green7, int blue7, int red8, int green8, int blue8, int red9, int green9, int blue9, int red10, int green10, int blue10) {
+void dops6(int red1, int green1, int blue1, int red2, int green2, int blue2, int red3, int green3, int blue3, int red4, int green4, int blue4, int red5, int green5, int blue5, int red6, int green6, int blue6) { //Dops RGB (Flash 3)
   if (initMode == 1){
-    blackout();
     cycle = 0;
     initMode = 0;
   }
+  switch(cycle){
+    case 0:
+      r = red1;
+      g = green1;
+      b = blue1;
+      cycle = 1;
+      break;
+    case 1:
+      r = red2;
+      g = green2;
+      b = blue2;
+      cycle = 2;
+      break;
+    case 2:
+      r = red3;
+      g = green3;
+      b = blue3;
+      cycle = 3;
+      break;
+    case 3:
+      r = red4;
+      g = green4;
+      b = blue4;
+      cycle = 4;
+      break;
+    case 4:
+      r = red5;
+      g = green5;
+      b = blue5;
+      cycle = 5;
+      break;
+    case 5:
+      r = red6;
+      g = green6;
+      b = blue6;
+      cycle = 0;
+      break;
+  }
+  for(int i = 0; i < LED_COUNT; i++){
+    leds0[i] = CRGB(r, g, b);
+    leds1[i] = CRGB(r, g, b);
+  }
+  FastLED.show();
+  delay(50);
+  blackout();
+  FastLED.show();
+  delay(50);
+}
+
+void dops(int colors[]) { //test this
+  if (initMode == 1){
+    blackout();
+    cycle = 0;
+    subCycle = 0;
+    initMode = 0;
+  }
+  if(subCycle == 0){
+    r = colors[cycle];
+    g = colors[(cycle + 1)];
+    b = colors[(cycle + 2)];
+    cycle = cycle + 3;
+    for(int i = 0; i < LED_COUNT; i++){
+      leds0[i] = CRGB(r, g, b);
+      leds1[i] = CRGB(r, g, b);
+    }
+    subCycle = 1;
+    if (cycle >= *(&colors + 1) - colors){
+      cycle = 0;
+    }
+  } else {
+    subCycle = 0;
+    blackout();
+  }
+  FastLED.show();
+  delay(10);
 }
 
 void rainbowFade() { //Rainbow fade (fade 7)
   if (initMode == 1){
       r = 255;
+      g = 0;
+      b = 0;
       initMode = 0;
   }
   if (r == 255 && g < 255 && b == 0){
@@ -270,7 +348,7 @@ void dopsRandomRectified() { //dops random, adjusted colors to avoid pastels and
   delay(1);
 }
 
-void sinWave() {
+void sinWave() { //WIP
   if (initMode == 1){
       initMode = 0;
       cycle = 0;
@@ -310,31 +388,34 @@ void fill(int red, int green, int blue) {
   delay(1);
 }
 
-void fillBounce(int red, int green, int blue) { //WIP
+void fillFade(int red, int green, int blue) { //WIP
   if (initMode == 1){
     r = red;
     g = green;
     b = blue;
-    initMode = 2;
+    initMode = 0;
     cycle = 0;
+    subCycle = 0;
   }
-  switch(initMode) {
-    case 2:
-      leds0[cycle] = CRGB(r, g, b);
-      leds1[cycle] = CRGB(r, g, b);
-      cycle++;
+  switch(subCycle) {
+    case 0:
       if (cycle >= LED_COUNT) {
-        initMode = 3;
+        subCycle = 1;
         cycle = 0;
+      } else {
+        leds0[cycle] = CRGB(r, g, b);
+        leds1[cycle] = CRGB(r, g, b);
+        cycle++;
       }
       break;
-    case 3:
-      leds0[cycle] = CRGB(0, 0, 0);
-      leds1[cycle] = CRGB(0, 0, 0);
-      cycle++;
+    case 1:
       if (cycle >= LED_COUNT) {
-        initMode = 2;
+        subCycle = 0;
         cycle = 0;
+      } else {
+        leds0[cycle] = CRGB(0, 0, 0);
+        leds1[cycle] = CRGB(0, 0, 0);
+        cycle++;
       }
       break;
   }
@@ -347,37 +428,54 @@ void fillFive(int red1, int green1, int blue1, int red2, int green2, int blue2, 
     blackout();
     initMode = 0;
     cycle = 0;
+    subCycle = 1;
   }
   if (cycle >= LED_COUNT) {
     blackout();
     cycle = 0;
   }
-  int line = cycle/5;
-  switch(line) {
+  int line = 0;
+  if((cycle + 5) % 5 == 0){
+    line = 5;
+  } else if ((cycle + 5) % 4 == 0) {
+    line = 4;
+  } else if ((cycle + 5) % 3 == 0) {
+    line = 3;
+  } else if ((cycle + 5) % 2 == 0) {
+    line = 2;
+  } else {
+    line = 1;
+  }
+  switch(subCycle) {
     case 1:
       r = red1;
       g = green1;
       b = blue1;
+      subCycle++;
       break;
     case 2:
       r = red2;
       g = green2;
       b = blue2;
+      subCycle++;
       break;
     case 3:
       r = red3;
       g = green3;
       b = blue3;
+      subCycle++;
       break;
     case 4:
       r = red4;
       g = green4;
       b = blue4;
+      subCycle++;
       break;
     case 5:
       r = red5;
       g = green5;
       b = blue5;
+      subCycle = 1;
       break;
   }
   leds0[cycle] = CRGB(r, g, b);
@@ -387,36 +485,130 @@ void fillFive(int red1, int green1, int blue1, int red2, int green2, int blue2, 
   delay(1);
 }
 
+void lightning(int red, int green, int blue){
+  if (initMode == 1){
+    blackout();
+    r = red;
+    g = green;
+    b = blue;
+    initMode = 0;
+    cycle = 0;
+    subCycle = 0;
+  }
+  if (cycle < LED_COUNT) {
+    leds0[cycle] = CRGB(r, g, b);
+    leds1[cycle] = CRGB(r, g, b);
+    cycle = cycle + (random()%(5-4 + 1) + 4);
+  } else {
+    cycle = 0;
+    FastLED.show();
+    delay(70);
+    blackout();
+  }
+}
+
+void fire(int red1, int green1, int blue1, int red2, int green2, int blue2){
+  if (initMode == 1){
+    blackout();
+    r = red1;
+    g = green1;
+    b = blue1;
+    initMode = 0;
+    cycle = 0;
+    subCycle = 0;
+  }
+  if (cycle < LED_COUNT) {
+    leds0[cycle] = CRGB(r, g, b);
+    leds1[cycle] = CRGB(r, g, b);
+    cycle = cycle + (random()%(5-4 + 1) + 4);
+  } else {
+    cycle = 0;
+    FastLED.show();
+    delay(90);
+    blackout();
+    for(int i = 0; i < LED_COUNT; i++){
+      leds0[i] = CRGB(red2, green2, blue2);
+      leds1[i] = CRGB(red2, green2, blue2);
+    }
+  }
+}
+
 void loop() {
   checkButtons();
 
   switch(mode) {
     case 0:
-      dopsRGB();
+      fire(100, 25, 0, 0, 0, 20);
       break;
     case 1:
-      rainbowFade();
+      fire(0, 25, 150, 0, 100, 25);
       break;
     case 2:
-      twinklePastel();
+      lightning(50, 50, 150);
       break;
     case 3:
       twinkleRectified();
       break;
     case 4:
-      dopsRandom();
+      fillFade(50, 50, 150);
       break;
     case 5:
-      dopsRandomRectified();
+      fillFive(0, 30, 75, 30, 0, 75, 0, 75, 30, 0, 0, 100, 75, 75, 0);
       break;
     case 6:
-      sinWave(); //currently broken
+      fire(100, 25, 0, 0, 0, 20);
       break;
     case 7:
-      fill(50, 50, 150);
+      fillFade(100, 0, 0);
       break;
     case 8:
-      fillFive(150, 0, 0, 0, 150, 0, 0, 0, 150, 150, 0, 150, 150, 150, 0);
+      fillFive(150, 0, 0, 0, 150, 0, 0, 0, 150, 0, 150, 0, 0, 0, 150);
+      break;
+    case 9:
+      dopsRandomRectified();
+      break;
+    case 10:
+      dops6(100, 0, 10, 0, 0, 100, 0, 0, 100, 0, 100, 0, 0, 0, 100, 0, 0, 100);
+      break;
+    case 11:
+      dops6(127, 8, 120, 4, 123, 128, 4, 123, 128, 127, 8, 120, 4, 123, 128, 4, 123, 128);
+      break;
+    case 12:
+      dops6(30, 0, 75, 0, 20, 100, 0, 102, 20, 30, 0, 75, 0, 20, 100, 0, 102, 20);
+      break;
+    case 13:
+      fire(100, 0, 0, 100, 25, 0);
+      break;
+    case 14:
+      lightning(100, 0, 0);
+      break;
+    case 15:
+      fillFade(25, 0, 100);
       break;
   }
 }
+
+//***List of finished modes***
+//Dops RGB
+//Dops Random
+//Dops Random Rectified
+//Rainbow Fade
+//Twinkle Pastel
+//Twinkle Rectified
+//Fill*
+//Fill Five*
+//Lightning*
+
+//***List of WIP modes***
+//Dops
+//Sine
+
+/*
+      Ξ⌇⌇Ǝ━━━━
+       ⌇⌇
+       ⌇⌇
+       ⌇
+ _______________
+ \~~~~~~~~~~~~~/
+  \___________/
+*/
